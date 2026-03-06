@@ -5,12 +5,14 @@ import argparse
 
 from google.genai import types
 
-load_dotenv()
+_ = load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 model = "gemini-2.5-flash"
 parser = argparse.ArgumentParser(description="Chatbot")
-parser.add_argument("user_prompt", type=str, help="User prompt")
+_ = parser.add_argument("user_prompt", type=str, help="User prompt")
+_ = parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+
 args = parser.parse_args()
 
 if api_key is None:
@@ -22,9 +24,12 @@ def main():
    
     if res_from_ai.usage_metadata == None:
         raise RuntimeError("No usage metadata in ai response")
-
-    print(f"Prompt tokens: {res_from_ai.usage_metadata.prompt_token_count}")
-    print(f"Response tokens: { res_from_ai.usage_metadata.candidates_token_count }")
+    
+    if args.verbose:
+        print(f"User prompt: {args.user_prompt}")
+        print(f"Prompt tokens: {res_from_ai.usage_metadata.prompt_token_count}")
+        print(f"Response tokens: { res_from_ai.usage_metadata.candidates_token_count }")
+    
     print(res_from_ai.text)
 
 if __name__ == "__main__":
