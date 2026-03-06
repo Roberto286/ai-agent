@@ -1,11 +1,11 @@
 import os
 
-from general_functions import is_outside_working_directory
+from general_functions import check_directory
 
 
 def get_file_info(working_directory, directory):
     try:
-        is_inside, is_dir, target_dir = is_outside_working_directory(working_directory, directory) 
+        is_inside, is_dir, target_dir = check_directory(working_directory, directory) 
         results = [f"Result for '{directory}' directory:"] 
  
         if is_inside == False:
