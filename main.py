@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 from google import genai
 import argparse
 
+from google.genai import types
+
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
@@ -15,7 +17,8 @@ if api_key is None:
     raise RuntimeError("Put your api_key in .env")
 
 def main():
-    res_from_ai = client.models.generate_content(contents=args.user_prompt, model=model)
+    messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
+    res_from_ai = client.models.generate_content(contents=messages, model=model)
    
     if res_from_ai.usage_metadata == None:
         raise RuntimeError("No usage metadata in ai response")
