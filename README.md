@@ -72,3 +72,26 @@ uv run python main.py "Your initial prompt here" --verbose
 - `prompts.py`: Stores the system prompt used to guide the AI's behavior.
 - `config.py`: Configuration settings for the chatbot.
 
+## How to Add New Functions
+
+To extend the agent's capabilities with new functions, follow these steps:
+
+1.  **Create a New Function File**:
+    Define a new Python file for your function within the `/functions` directory (e.g., `functions/my_new_function.py`).
+    Implement the function logic in this file.
+
+2.  **Define the Function Schema**:
+    In the same file, define the schema for your new function using the `tool_code` decorator.
+    This schema describes the function's purpose, its parameters, and their types, which helps the AI model understand how to use it.
+
+3.  **Add to `available_functions.py`**:
+    Import your new function and its schema into `available_functions.py`.
+    Add your function to the `available_functions` list and its schema to the `tools` list.
+
+4.  **Update the System Prompt**:
+    Modify the `prompts.py` file to include information about your new function in the system prompt.
+    Explain what the function does and when the AI should consider using it.
+
+5.  **Write a Test**:
+    Create a corresponding test file in the `/tests` directory (e.g., `tests/test_my_new_function.py`).
+    Write unit tests to ensure your new function works as expected and integrates correctly with the agent.
