@@ -4,9 +4,11 @@ from dotenv import load_dotenv
 from google import genai
 import argparse
 from google.genai import types
-from available_functions import available_functions, call_function
-from config import DEFAULT_MODEL, MAX_CONVERSATION_TURNS
-from prompts import system_prompt
+from available_functions import available_functions
+from core.function_handler import call_function
+from utils.config import DEFAULT_MODEL, MAX_CONVERSATION_TURNS
+from utils.prompts import system_prompt
+from utils.display_utils import print_verbose_output
 
 
 def configure_chatbot():
@@ -34,19 +36,6 @@ def configure_chatbot():
     return client, DEFAULT_MODEL, args
 
 
-def _print_verbose_output(args, res_from_ai):
-    """Prints verbose output if enabled."""
-    if args.verbose:
-        print(f"User prompt: {args.user_prompt}")
-        if res_from_ai.usage_metadata:
-            print(f"Prompt tokens: {res_from_ai.usage_metadata.prompt_token_count}")
-            print(
-                f"Response tokens: {res_from_ai.usage_metadata.candidates_token_count}"
-            )
-        else:
-            print("No usage metadata available.")
-
-
 def main():
     client, model_name, args = configure_chatbot()
 
@@ -71,7 +60,7 @@ def main():
         if candidate_content:
             messages.append(candidate_content)
 
-        _print_verbose_output(args, res_from_ai)
+        print_verbose_output(args, res_from_ai)
 
         if not res_from_ai.function_calls:
             print("Response:")
