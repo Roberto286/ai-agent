@@ -2,8 +2,10 @@ import os
 from dotenv import load_dotenv
 from google import genai
 import argparse
-
 from google.genai import types
+from available_functions import available_functions, call_function
+from prompts import system_prompt
+
 
 _ = load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -20,7 +22,7 @@ if api_key is None:
 
 def main():
     messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
-    res_from_ai = client.models.generate_content(contents=messages, model=model)
+    res_from_ai = client.models.generate_content(contents=messages, model=model, config=types.GenerateContentConfig(system_instruction=system_prompt, tools=[available_functions ]))
    
     if res_from_ai.usage_metadata == None:
         raise RuntimeError("No usage metadata in ai response")
@@ -29,8 +31,25 @@ def main():
         print(f"User prompt: {args.user_prompt}")
         print(f"Prompt tokens: {res_from_ai.usage_metadata.prompt_token_count}")
         print(f"Response tokens: { res_from_ai.usage_metadata.candidates_token_count }")
-    
-    print(res_from_ai.text)
+
+    if res_from_ai.function_calls:
+        print(res_from_ai.function_calls)
+        for fc in res_from_ai.function_calls:
+            function_call_result = call_function(fc, args.verbose)
+
+            if not function_call_result.parts:
+                raise Exception("No valid parts in function_call_result")
+            
+            if not function_call_result.parts[0].function_response:
+                raise Exception("function_response is None") 
+
+            if not function_call_result.parts[0].function_response.response:
+                raise Exception("response is None")
+
+            if args.verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
+    else:
+        print(res_from_ai.text)
 
 if __name__ == "__main__":
     main()
